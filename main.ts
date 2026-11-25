@@ -20,11 +20,15 @@ function validate(line: string): void {
   if (line.includes("\n") || line.includes("\r")) {
     throw new Error("line must be a single line");
   }
-  // Reject control characters (plain text only).
+  // Reject ALL control characters (plain text only, no tabs either).
   for (const ch of line) {
-    if (ch.charCodeAt(0) < 0x20 && ch !== "\t") {
+    if (ch.charCodeAt(0) < 0x20 || ch.charCodeAt(0) === 0x7f) {
       throw new Error("line must not contain control characters");
     }
+  }
+  // No leading/trailing whitespace: the file must be exactly the line.
+  if (line !== line.trim()) {
+    throw new Error("line must not have leading or trailing whitespace");
   }
   const words = line.trim().split(/\s+/).length;
   if (words > MAX_WORDS) {
